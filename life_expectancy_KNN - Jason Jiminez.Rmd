@@ -1,0 +1,71 @@
+---
+title: "Econ 573 Paper"
+output: html_document
+date: '2022-11-15'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+devtools::install_github("hadley/haven")
+```
+
+```{r}
+getwd()
+HRS <- read.csv("/Users/jasonjimenez/Desktop/HRSfinal.csv")
+HRS
+```
+
+```{r}
+library(caret)
+set.seed(1)
+
+HRS = subset(HRS, select = c(hhidpn, wave, dage_m, id, iwbeg, n2, nt, puffpos, puff, timwlk))
+na.omit(HRS)
+
+normalize <- function(x) {
+return ((x - min(x)) / (max(x) - min(x))) }
+```
+
+```{r}
+model <- train(
+  dage_y ~ .,
+  data = HRS,
+  method = 'knn'
+)
+model
+```
+
+
+```{r}
+
+```
+
+```{r}
+inTraining <- createDataPartition(HRS$agey_m, p = .80, list = FALSE)
+training <- HRS[inTraining,]
+testing  <- HRS[-inTraining,]
+```
+
+```{r}
+model3 <- train(
+  dage_y ~ .,
+  data = training,
+  method = 'knn',
+  
+)
+model3
+```
+
+```{r}
+test.features = subset(testing, select=-c(agey_m))
+test.target = subset(testing, select=agey_m)[,1]
+
+predictions = predict(model3, newdata = test.features)
+
+# RMSE
+sqrt(mean((test.target - predictions)^2))
+```
+
